@@ -1,68 +1,163 @@
 package com.accidentaldeveloper.graph;
 
 
+
+
 import android.graphics.Color;
+import android.hardware.Sensor;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
-       private LineChart mChart; // chart of define kara
+public class MainActivity extends AppCompatActivity  {
+       private LineChart mChart;
        private Thread thread;
+       private int seconds;
+       final Handler handler=new Handler();
+       Random random = new Random();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
+
         mChart = (LineChart) findViewById(R.id.lineGraph);
 
-        setData(40,60);
+        mChart.setDragEnabled(true);
+        mChart.setScaleEnabled(true);
+        mChart.setBackgroundColor(Color.BLACK);
 
 
+        CountDownTimer timer = new CountDownTimer(15000,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                makeGraph(50,80);
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(MainActivity.this, "Finish", Toast.LENGTH_SHORT).show();
+            }
+        }.start();
+    }
+
+      //this function is to make graph
+
+
+     public void makeGraph(int a,int b){
+        ArrayList<Entry> dataValues = new ArrayList<>();
+        int x=a;
+         int y=b;
+        for(int i = 0;i<x;i++){
+            dataValues.add(new Entry(i,y*random.nextInt(150)+50));
+        }
+        LineDataSet lineDataSet = new LineDataSet(dataValues,"BANJA NA PLS");
+        lineDataSet.setColor(Color.MAGENTA);
+        lineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineDataSet.setCubicIntensity(0.2f);
+        LineData lineData = new LineData(lineDataSet);
+        mChart.setData(lineData);
+
+        mChart.moveViewToX(lineDataSet.getEntryCount());
+        mChart.animateX(500);
+         Legend l = mChart.getLegend();
+
+         // modify the legend ...
+         l.setForm(Legend.LegendForm.LINE);
+         l.setTextColor(Color.WHITE);
+
+         XAxis xl = mChart.getXAxis();
+         xl.setTextColor(Color.WHITE);
+//        xl.setDrawGridLines(true);
+         xl.setAvoidFirstLastClipping(true);
+         xl.setEnabled(true);
+
+         YAxis leftAxis = mChart.getAxisLeft();
+         leftAxis.setTextColor(Color.WHITE);
+         leftAxis.setDrawGridLines(false);
+         leftAxis.setDrawGridLines(true);
+
+         YAxis rightAxis = mChart.getAxisRight();
+         rightAxis.setEnabled(false);
+
+         mChart.getAxisLeft().setDrawGridLines(false);
+         mChart.getXAxis().setDrawGridLines(false);
+         mChart.setDrawBorders(false);
+
+     }
 
 
 
     }
-    private void setData(int count , int range){
-        ArrayList<Entry> yvals1 = new ArrayList<>();
-        for(int i = 0 ; i<count;i++){
-            float val = (float)(Math.random()*range)+0;
-            yvals1.add(new Entry(i,val));
-        }
-        ArrayList<Entry> yvals2 = new ArrayList<>();
-        for(int i = 0 ; i<count;i++){
-            float val = (float)(Math.random()*range)+0;
-            yvals2.add(new Entry(i,val));
-        }
-        ArrayList<Entry> yvals3 = new ArrayList<>();
-        for(int i = 0 ; i<count;i++){
-            float val = (float)(Math.random()*range)+0;
-            yvals3.add(new Entry(i,val));
-        }
-
-        LineDataSet set1,set2,set3;
-        set1 = new LineDataSet(yvals1,"dataset1");
-        set2 = new LineDataSet(yvals2,"dataset1");
-        set3 = new LineDataSet(yvals3,"dataset1");
-
-        LineData data = new LineData(set1,set2,set3);
-        mChart.animateX(2000);
 
 
-        mChart.setData(data);
-    }
 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
               // phele ka code//
 //        ArrayList<Entry> info = new ArrayList<>();
 //        int i =0;
@@ -122,3 +217,23 @@ public class MainActivity extends AppCompatActivity {
 //
 //
 //    }
+
+
+//// JANVI KA CODE
+//handler.post(new Runnable() {
+//@Override
+//public void run() {
+//        setData((int) Math.random(), (int) Math.random());
+//        mChart.invalidate();
+//        mChart.notifyDataSetChanged();
+//        mChart.invalidate();
+//        handler.postDelayed(this,800);
+//        handler.getLooper();
+//        }
+//        });
+////handler.post(runnable);
+
+
+
+// ye code line ko move karta hai
+// mChart.moveViewToX(set1.getEntryCount());
